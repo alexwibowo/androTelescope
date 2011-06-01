@@ -20,7 +20,7 @@ public class ImageRequestValidator {
 
     public void validate()
             throws InvalidImageRequestException {
-        if (imageBytes != null && imageBytes.length > 0 ) {
+        if (imageBytes != null && imageBytes.length < 0 ) {
             throw new InvalidImageRequestException("Empty image",HttpServletResponse.SC_NO_CONTENT);
         }
         if (!isSupportedContentType()) {

@@ -25,8 +25,14 @@ public class Photographer  extends Thread{
         Camera.PictureCallback mPictureCallback = new Camera.PictureCallback() {
             public void onPictureTaken(byte[] imageData, Camera camera) {
                 if (imageData != null) {
-                    FileUtilities.storeByteImage(imageData, cacheDir, "chicken");
-                    camera.startPreview();
+                    try {
+//                        FileUtilities.storeByteImage(imageData, cacheDir, "chicken");
+                        new FileSender().send(imageData, "http://10.1.1.4:8081/androTelescope/imageSaver");
+                    } catch (Exception e) {
+                        Log.e(TAG, "An error had occurred while sending the file to the destination", e);
+                    } finally{
+                        camera.startPreview();
+                    }
                 }
             }
         };

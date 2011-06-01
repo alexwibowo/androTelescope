@@ -1,5 +1,13 @@
 package org.isolution.androtelescope.server;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.entity.FileEntity;
+import org.apache.http.entity.mime.HttpMultipart;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.impl.io.HttpResponseParser;
+import org.apache.http.message.BasicHttpRequest;
+import org.apache.http.message.BasicHttpResponse;
 import org.apache.log4j.Logger;
 
 import javax.servlet.ServletException;
@@ -38,6 +46,9 @@ public class ImageReceiverServlet  extends HttpServlet{
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         LOG.info("Received incoming image..");
+
+
+        MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
         byte[] bytes = getImageAsBytes(request);
 
         int returnStatus;
