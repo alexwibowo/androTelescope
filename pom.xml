@@ -22,6 +22,7 @@
     <properties>
         <javaee.version>6.0</javaee.version>
 
+        <guice.version>3.0</guice.version>
         <spring.version>3.0.5.RELEASE</spring.version>
         <spring-ws.version>2.0.1.RELEASE</spring-ws.version>
 
@@ -126,15 +127,15 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpclient</artifactId>
-                    <version>${apache.commons-httpcomponent.version}</version>
-                </dependency>
-                <dependency>
-                    <groupId>org.apache.httpcomponents</groupId>
-                    <artifactId>httpmime</artifactId>
-                    <version>${apache.commons-httpcomponent.version}</version>
-                </dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${apache.commons-httpcomponent.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpmime</artifactId>
+            <version>${apache.commons-httpcomponent.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>junit</groupId>

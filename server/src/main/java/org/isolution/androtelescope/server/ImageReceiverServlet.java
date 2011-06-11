@@ -1,27 +1,15 @@
 package org.isolution.androtelescope.server;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.entity.FileEntity;
-import org.apache.http.entity.mime.HttpMultipart;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.impl.io.HttpResponseParser;
-import org.apache.http.message.BasicHttpRequest;
-import org.apache.http.message.BasicHttpResponse;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 import org.apache.log4j.Logger;
+import org.isolution.androtelescope.server.domain.imageCaching.ImageCache;
 
 import javax.servlet.ServletException;
-import javax.servlet.ServletInputStream;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.MessageFormat;
-
-import static org.apache.commons.io.IOUtils.*;
 
 /**
  * A simple servlet for receiving image & save it to a local drive
@@ -30,12 +18,19 @@ import static org.apache.commons.io.IOUtils.*;
  * Date: 31/05/11
  * Time: 9:24 PM
  */
-@javax.servlet.annotation.WebServlet(
-        name = "ImageReceiverServlet",
-        urlPatterns = "/imageSaver"
-)
+@Singleton
 public class ImageReceiverServlet  extends HttpServlet{
     public static final Logger LOG = Logger.getLogger(ImageReceiverServlet.class.getName());
+
+    private ImageCache imageCache;
+
+    private ImageReceiverServletHelper servletHelper;
+
+    @Inject
+    public ImageReceiverServlet(ImageCache imageCache, ImageReceiverServletHelper servletHelper) {
+        this.imageCache = imageCache;
+        this.servletHelper = servletHelper;
+    }
 
     @Override
     public String getServletInfo() {
@@ -47,16 +42,11 @@ public class ImageReceiverServlet  extends HttpServlet{
             throws ServletException, IOException {
         LOG.info("Received incoming image..");
 
-
-        MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-        byte[] bytes = getImageAsBytes(request);
-
+//        MultipartEntity reqEntity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
         int returnStatus;
         try {
-            new ImageRequestValidator(request.getContentType(), bytes).validate();
-
-            LOG.info(MessageFormat.format("Saving image. Image size: {0}", bytes.length));
-            returnStatus = saveImage(bytes);
+            imageCache.save(servletHelper.readBytes(request.getInputStream(), request.getContentType()));
+            returnStatus = HttpServletResponse.SC_ACCEPTED;
         } catch (InvalidImageRequestException e) {
             LOG.error(e.getMessage());
             returnStatus = e.getStatusCode();
@@ -67,30 +57,9 @@ public class ImageReceiverServlet  extends HttpServlet{
     }
 
 
-    private int saveImage(byte[] bytes) throws IOException {
-        BufferedOutputStream bufferedWriter = null;
-        try {
-            bufferedWriter = new BufferedOutputStream(new FileOutputStream(new File("/tmp/chicken.jpg")));
-            write(bytes, bufferedWriter);
-            return HttpServletResponse.SC_ACCEPTED;
-        } catch (Exception e) {
-            LOG.error("An error had occurred while saving the image.", e);
-            return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
-        } finally {
-            if (bufferedWriter != null) {
-                bufferedWriter.flush();
-                closeQuietly(bufferedWriter);
-            }
-        }
-    }
-
-    private byte[] getImageAsBytes(HttpServletRequest request) throws IOException {
-        ServletInputStream is = request.getInputStream();
-        return toByteArray(is);
-    }
-
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         response.setStatus(HttpServletResponse.SC_METHOD_NOT_ALLOWED);
     }
 }

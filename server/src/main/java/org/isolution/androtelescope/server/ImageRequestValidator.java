@@ -7,18 +7,18 @@ import javax.servlet.http.HttpServletResponse;
  * Date: 31/05/11
  * Time: 10:53 PM
  */
-public class ImageRequestValidator {
+class ImageRequestValidator {
 
     private final String contentType;
 
     private final byte[] imageBytes;
 
-    public ImageRequestValidator(String contentType, byte[] imageBytes) {
+    ImageRequestValidator(String contentType, byte[] imageBytes) {
         this.contentType = contentType;
         this.imageBytes = imageBytes;
     }
 
-    public void validate()
+    void validate()
             throws InvalidImageRequestException {
         if (imageBytes != null && imageBytes.length < 0 ) {
             throw new InvalidImageRequestException("Empty image",HttpServletResponse.SC_NO_CONTENT);
